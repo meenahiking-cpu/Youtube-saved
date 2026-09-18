@@ -1,0 +1,193 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VidSave — YouTube Video Downloader</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+  body { background: #0f0f14; color: #e8e8ee; line-height: 1.6; }
+  .container { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+
+  header { padding: 22px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .nav { display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: #ff3b3b; }
+  nav.links a { color: #b9b9c7; text-decoration: none; margin-left: 26px; font-size: 15px; transition: color .2s; }
+  nav.links a:hover { color: #fff; }
+
+  .hero { text-align: center; padding: 64px 0 40px; }
+  .hero h1 { font-size: clamp(30px, 6vw, 52px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; }
+  .hero h1 .grad { background: linear-gradient(90deg, #ff3b3b, #ff8a3d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { color: #a2a2b2; max-width: 620px; margin: 16px auto 36px; font-size: 17px; }
+
+  .dl-box { background: #17171f; border: 1px solid rgba(255,255,255,0.09); border-radius: 16px; padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,0.45); text-align: left; }
+  .dl-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  input[type="text"] { flex: 1; min-width: 240px; background: #0f0f14; border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 14px 16px; border-radius: 10px; font-size: 15px; outline: none; transition: border-color .2s; }
+  input[type="text"]:focus { border-color: #ff3b3b; }
+  .btn { border: none; cursor: pointer; font-weight: 700; font-size: 15px; padding: 14px 26px; border-radius: 10px; transition: transform .15s, box-shadow .2s, background .2s; }
+  .btn-primary { background: linear-gradient(90deg, #ff3b3b, #ff6a2b); color: #fff; box-shadow: 0 8px 24px rgba(255,59,59,0.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,59,59,0.45); }
+  .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.18); color: #d6d6e2; }
+  .btn-ghost:hover { border-color: #ff3b3b; color: #fff; }
+
+  .qualities { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; align-items: center; }
+  .qualities span { font-size: 13px; color: #8b8b9c; margin-right: 4px; }
+  .chip { background: #0f0f14; border: 1px solid rgba(255,255,255,0.12); color: #c5c5d4; font-size: 13px; padding: 7px 14px; border-radius: 999px; cursor: pointer; transition: all .15s; }
+  .chip:hover { border-color: rgba(255,59,59,0.6); }
+  .chip.active { background: rgba(255,59,59,0.15); border-color: #ff3b3b; color: #ff9b9b; font-weight: 600; }
+
+  #status { margin-top: 16px; font-size: 14px; min-height: 22px; color: #8fe08f; }
+  #status.error { color: #ff8a8a; }
+  .progress { height: 10px; background: #0f0f14; border-radius: 999px; overflow: hidden; margin-top: 10px; display: none; }
+  .progress div { height: 100%; width: 0; background: linear-gradient(90deg, #ff3b3b, #ff8a3d); border-radius: 999px; transition: width .2s; }
+
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; padding: 56px 0; }
+  .card { background: #17171f; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 26px; transition: transform .2s, border-color .2s; }
+  .card:hover { transform: translateY(-4px); border-color: rgba(255,59,59,0.5); }
+  .card h3 { font-size: 17px; margin-bottom: 8px; }
+  .card p { color: #a2a2b2; font-size: 14.5px; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; background: rgba(255,59,59,0.15); color: #ff9b9b; padding: 4px 10px; border-radius: 999px; margin-bottom: 14px; }
+
+  .howto { background: #14141b; border-radius: 14px; padding: 30px; margin-bottom: 56px; }
+  .howto h2 { font-size: 20px; margin-bottom: 14px; }
+  .howto ol { margin-left: 20px; color: #b9b9c7; font-size: 15px; }
+  .howto li { margin-bottom: 8px; }
+
+  footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 30px 0 40px; text-align: center; color: #8b8b9c; font-size: 14px; }
+
+  @media (max-width: 640px) {
+    nav.links a { margin-left: 14px; font-size: 14px; }
+    .dl-row { flex-direction: column; }
+    .btn { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <div class="logo">Vid<span>Save</span></div>
+    <nav class="links">
+      <a href="#features">Features</a>
+      <a href="#howto">How It Works</a>
+      <a href="#">FAQ</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Download YouTube videos in <span class="grad">original quality</span></h1>
+    <p>Paste any YouTube link below and grab MP4, WebM, or audio — free, fast, and with no watermarks. Up to 4K supported.</p>
+
+    <div class="dl-box">
+      <div class="dl-row">
+        <input type="text" id="urlInput" placeholder="Paste a YouTube link here (https://youtube.com/watch?v=...)" aria-label="YouTube URL">
+        <button class="btn btn-primary" id="dlBtn">Download</button>
+      </div>
+      <div class="qualities" id="qualityRow">
+        <span>Quality:</span>
+        <button class="chip active" data-q="4K MP4">4K</button>
+        <button class="chip" data-q="1080p MP4">1080p</button>
+        <button class="chip" data-q="720p MP4">720p</button>
+        <button class="chip" data-q="Audio MP3">Audio</button>
+      </div>
+      <div id="status" role="status"></div>
+      <div class="progress" id="progressWrap"><div id="progressBar"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <div class="features">
+      <div class="card">
+        <span class="badge">1</span>
+        <h3>Paste &amp; Go</h3>
+        <p>Copy any YouTube URL and click download. No accounts, no sign-ups, no software to install.</p>
+      </div>
+      <div class="card">
+        <span class="badge">2</span>
+        <h3>Choose Your Quality</h3>
+        <p>Pick from 4K, 1080p, 720p MP4 or extract just the audio track in MP3 format.</p>
+      </div>
+      <div class="card">
+        <span class="badge">3</span>
+        <h3>Fast &amp; Safe</h3>
+        <p>Torrent-free direct downloads with a secure connection. Save files straight to your device.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="howto">
+  <div class="container">
+    <div class="howto">
+      <h2>How it works</h2>
+      <ol>
+        <li>Copy the YouTube link from the video page you want to save.</li>
+        <li>Paste it into the box above and select your preferred quality.</li>
+        <li>Hit Download — your file will be saved to your device shortly.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    VidSave &copy; 2025 — Download videos for personal use. Respect YouTube's Terms of Service.
+  </div>
+</footer>
+
+<script>
+(function(){
+  var urlInput = document.getElementById('urlInput');
+  var dlBtn = document.getElementById('dlBtn');
+  var status = document.getElementById('status');
+  var progressWrap = document.getElementById('progressWrap');
+  var progressBar = document.getElementById('progressBar');
+  var quality = '4K MP4';
+
+  document.getElementById('qualityRow').addEventListener('click', function(e){
+    if(e.target.classList.contains('chip')){
+      document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+      e.target.classList.add('active');
+      quality = e.target.dataset.q;
+    }
+  });
+
+  urlInput.addEventListener('paste', function(){
+    setTimeout(function(){ status.classList.remove('error'); status.textContent = ''; }, 0);
+  });
+
+  dlBtn.addEventListener('click', function(){
+    var val = urlInput.value.trim();
+    var ytPattern = /(?:youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]{6,}/;
+    if(!val || !ytPattern.test(val)){
+      status.classList.add('error');
+      status.textContent = 'Please enter a valid YouTube link.';
+      return;
+    }
+    status.classList.remove('error');
+    progressWrap.style.display = 'block';
+    progressBar.style.width = '0%';
+    var p = 0;
+    status.textContent = 'Fetching video info…';
+    var timer = setInterval(function(){
+      p += Math.random() * 14 + 4;
+      if(p >= 100){
+        p = 100;
+        clearInterval(timer);
+        progressBar.style.width = '100%';
+        status.textContent = 'Done! Your ' + quality + ' file is ready (simulated).';
+      } else {
+        progressBar.style.width = p + '%';
+        if(p > 30) status.textContent = 'Downloading… ' + Math.floor(p) + '%';
+      }
+    }, 180);
+  });
+})();
+</script>
+
+</body>
+</html>
